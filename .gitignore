@@ -1,0 +1,8 @@
+node_modules
+.env
+yarn.lock
+package-lock.json
+build
+** build
+tests/compoents/__snapshots__/*
+tests/compoents/pages/__snapshots__/*

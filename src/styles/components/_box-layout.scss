@@ -1,0 +1,37 @@
+.box-layout {
+  align-items: center;
+  // background: url('/images/abstract_bg.jpg');
+  background-size: cover;
+  display: flex;
+  // height: 100vh;
+  justify-content: center;
+  width: 100vw;
+}
+
+.box-layout__logo {
+  max-width: 200px;
+}
+
+.box-layout__box {
+  //background: fade-out(white, .15);
+  border-radius: 3px;
+  padding: $l-size $m-size;
+  text-align: center;
+  width: 40rem;
+}
+
+.box-layout__title {
+  margin: 0 0 $m-size 0;
+  line-height: 1;
+}
+
+.box-layout__aling-middle {
+  text-align: center;
+}
+
+.box-title__main-title {
+  font-size: 38px;
+  color: #3a3a3acc;
+  line-height: 56px;
+  text-align: center;
+}
