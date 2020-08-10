@@ -1,6 +1,15 @@
 
 .card-home{
     margin-top: 10px;
+    
+    @media (min-width: 768px) and (max-width: 993px) {
+       height: 377px !important;
+    }
+
+    @media (min-width: 994px) and (max-width: 1999px) {
+       height: 377px !important;
+    }
+
 }
 
 .image-card-home{

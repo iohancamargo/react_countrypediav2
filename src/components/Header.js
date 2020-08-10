@@ -1,15 +1,17 @@
 /* Libs  */
 import React from 'react';
 import { withRouter } from "react-router";
+import { Navbar } from 'react-bootstrap';
 
 export const Header = () => {
     return (
         <>
-            <header className="header">
-                <div className="content-header__content-container">
-                    <div className="header__content header__image"></div>
-                </div>
-            </header>
+            <Navbar bg="dark" variant="dark">
+                <Navbar.Brand href="#home">
+                
+                Countrypedia
+                </Navbar.Brand>
+            </Navbar>
         </>
     );
 };

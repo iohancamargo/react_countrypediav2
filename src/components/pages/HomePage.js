@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { BsSearch } from "react-icons/bs";
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
+import InfiniteScroll from "react-infinite-scroll-component";
 
 /* Bootstrap components */
 import { Container, Row, Col, Card, Form, InputGroup, FormControl, Button } from 'react-bootstrap';
@@ -10,32 +11,78 @@ import { Container, Row, Col, Card, Form, InputGroup, FormControl, Button } from
 /* Components */
 import { history } from '../../routers/AppRouter';
 import { startGetCountries } from '../../actions/countries';
-import InfiniteScroll from "react-infinite-scroll-component";
 
-function addCountriesAction(countries) {
+const addCountriesAction = (countries) => {
     return { type: 'POPULATE_COUNTRIES', countries }
 }
 
 const HomePage = () => {
     const dispatch = useDispatch();
     const [textFilter, setTextFilter] = useState("");
+    const [offSetSearch, setOffsetSearch] = useState(0);
     const [listCountries, setListCountries] = useState([]);
     const [alreadySearch, setAlreadySearch] = useState(false);
     const [alreadyFilter, setAlreadyFilter] = useState(false);
     const listCountriesRedux = useSelector(state => state.countries);
     const [listFilterdCountries, setListFilterdCountries] = useState([]);
 
+    const verifyCountrisToAdd = (countries) => {
+        let countriesToAdd = [];
+        countries.forEach(newCountry => {
+            let findCountry = false;
+            listCountriesRedux.forEach(countryRedux => {
+                if(countryRedux.alpha3Code === newCountry.alpha3Code){
+                    findCountry = true;
+                }
+            });
+            if(!findCountry){
+                countriesToAdd.push(newCountry);
+            }
+        });
+        return countriesToAdd;
+    }
+
+    const verifyCountrisToAddInList = (countries) => {
+        let countriesToAdd = [];
+        countries.forEach(newCountry => {
+            let findCountry = false;
+            listCountries.forEach(countryRedux => {
+                if(countryRedux.alpha3Code === newCountry.alpha3Code){
+                    findCountry = true;
+                }
+            });
+            if(!findCountry){
+                countriesToAdd.push(newCountry);
+            }
+        });
+        return countriesToAdd;
+    }
+
     const fetchMoreData = () => {
         if(listFilterdCountries.length === 0){
-            if(listCountries.length < 250){
+            if(listCountriesRedux.length < 250){
+                startGetCountries('', offSetSearch)
+                .then((resCountries) => {                    
+                    if (resCountries.success) {
+                        let countries = resCountries.data;
+                        let countriesToAdd = verifyCountrisToAdd(countries);
+                        let newStateRedux = [...listCountriesRedux, ...countriesToAdd];
+                        addCountries(newStateRedux);
+                        setOffsetSearch(offSetSearch + 6);
+                        setListCountries([...listCountries, ...newStateRedux.slice(listCountries.length, listCountries.length + 6)]);
+                    } else {
+                        toast.error("Não foi possível realizar a comunicação com a API...");
+                    }
+                });
+            } else {
                 setTimeout(() => {
                     setListCountries([...listCountries, ...listCountriesRedux.slice(listCountries.length, listCountries.length + 6)]);
-                }, 1000);
-            } 
+                }, 500);
+            }
         } else {
             setTimeout(() => {
                 setListCountries([...listCountries, ...listFilterdCountries.slice(listCountries.length, listCountries.length + 6)]);
-            }, 1000);
+            }, 500);
         }
     };
     
@@ -56,8 +103,26 @@ const HomePage = () => {
             });
             switch (filtredArr.length) {
                 case 0:
-                    setListCountries([]);
-                    setListFilterdCountries([]);
+                    if(listCountriesRedux.length < 250) {
+                        startGetCountries(textTyped, offSetSearch)
+                        .then((resCountries) => {                    
+                            if (resCountries.success) {
+                                let countries = resCountries.data;
+                                let countriesToAdd = verifyCountrisToAdd(countries);
+                                let newStateRedux = [...listCountriesRedux, ...countriesToAdd];
+                                let countriesList = verifyCountrisToAddInList(countriesToAdd);
+
+                                addCountries(newStateRedux);
+                                setListFilterdCountries([...listCountries,...countriesList]);
+                                setListCountries([...countriesList.slice(0, 6)]);
+                            } else {
+                                toast.error("Não foi possível realizar a comunicação com a API...");
+                            }
+                        });
+                    } else {
+                        setListCountries([]);
+                        setListFilterdCountries([]);
+                    }
                 break;
             
                 default:
@@ -79,7 +144,8 @@ const HomePage = () => {
     useEffect(() => {
         /* Garante que só será realizada uma request para popular o storage */        
         if (listCountriesRedux.length === 0) {
-            startGetCountries()
+            setOffsetSearch(6);
+            startGetCountries('', offSetSearch)
                 .then((resCountries) => {                    
                     setAlreadySearch(true);
                     if (resCountries.success) {
@@ -94,9 +160,8 @@ const HomePage = () => {
             setListCountries(listCountriesRedux.slice(listCountries.length, listCountries.length + 6));
             setAlreadySearch(true);
             setAlreadyFilter(true);
-        } 
-        
-    }, [listCountriesRedux] );
+        }
+    }, [] );
 
     return (
         alreadySearch === false ? (
@@ -146,11 +211,13 @@ const HomePage = () => {
                             </Form.Row>
                         </Form>
                         
+                        {/* (listCountries.length < listCountriesRedux.length) */}
+
                         <InfiniteScroll
                             dataLength={listCountries.length}
                             next={fetchMoreData}
                             hasMore={
-                                (listFilterdCountries.length <= 0 && listCountries.length < listCountriesRedux.length) || 
+                                (listFilterdCountries.length <= 0  && listCountriesRedux.length < 250 ) || 
                                 (listFilterdCountries.length > 0 && listCountries.length < listFilterdCountries.length)
                             }
                             loader={ 
@@ -163,7 +230,7 @@ const HomePage = () => {
                                 {listCountries.map((country) => (
                                     <Col xs={12} sm={12} md={4} key={country.alpha3Code} >
                                         <Card className="card-home align-items-center" >
-                                            <Card.Img variant="top" className="image-card-home"  src={country.flag.svgFile} title={country.name}/>
+                                            <Card.Img variant="top" className="image-card-home" src={country.flag.svgFile} title={country.name}/>
                                             <Card.Body className="box-layout__aling-middle">
                                                 <Card.Title>{country.nativeName}</Card.Title>
                                                 
