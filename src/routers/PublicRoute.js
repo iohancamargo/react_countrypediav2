@@ -10,7 +10,9 @@ const PublicRoute = ({ component: RouteComponent, ...rest }) => {
             render={routeProps => (
                     <>
                         <Header />
-                        <RouteComponent {...routeProps} />
+                        <div className="box__content">
+                            <RouteComponent {...routeProps} />
+                        </div>
                     </>
                 )
             }

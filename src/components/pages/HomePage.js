@@ -26,11 +26,13 @@ const HomePage = () => {
     const listCountriesRedux = useSelector(state => state.countries);
     const [listFilterdCountries, setListFilterdCountries] = useState([]);
 
-    const verifyCountrisToAdd = (countries) => {
+    const verifyCountrisToAdd = (countries, witchList) => {
         let countriesToAdd = [];
+        let arraySearch = witchList === 'redux' ? listCountriesRedux : listCountries;
+
         countries.forEach(newCountry => {
             let findCountry = false;
-            listCountriesRedux.forEach(countryRedux => {
+            arraySearch.forEach(countryRedux => {
                 if(countryRedux.alpha3Code === newCountry.alpha3Code){
                     findCountry = true;
                 }
@@ -42,20 +44,30 @@ const HomePage = () => {
         return countriesToAdd;
     }
 
-    const verifyCountrisToAddInList = (countries) => {
-        let countriesToAdd = [];
-        countries.forEach(newCountry => {
-            let findCountry = false;
-            listCountries.forEach(countryRedux => {
-                if(countryRedux.alpha3Code === newCountry.alpha3Code){
-                    findCountry = true;
-                }
-            });
-            if(!findCountry){
-                countriesToAdd.push(newCountry);
+    const orderByName = (arrayToOrder)  => {
+        let orderArray = arrayToOrder.sort(function compare(a, b) {
+            let nameA = a.name;
+            let nameB = b.name;
+
+            if(nameA === 'Åland Islands'){
+                nameA = nameA.replace('Å', 'A');
             }
+            if(nameB === 'Åland Islands'){
+                nameB = nameB.replace('Å', 'A');
+            }
+
+            if (nameA < nameB) return -1;
+            if (nameA > nameB) return 1;
+            return 0;
         });
-        return countriesToAdd;
+        return orderArray;
+    }
+
+    const ordenaArray = () => {
+        setTextFilter('');
+        let reduxArray = orderByName(listCountriesRedux);
+        addCountries(reduxArray);
+        setListCountries([...reduxArray.slice(0, 6)]);
     }
 
     const fetchMoreData = () => {
@@ -65,7 +77,7 @@ const HomePage = () => {
                 .then((resCountries) => {                    
                     if (resCountries.success) {
                         let countries = resCountries.data;
-                        let countriesToAdd = verifyCountrisToAdd(countries);
+                        let countriesToAdd = verifyCountrisToAdd(countries, 'redux');
                         let newStateRedux = [...listCountriesRedux, ...countriesToAdd];
                         addCountries(newStateRedux);
                         setOffsetSearch(offSetSearch + 6);
@@ -90,7 +102,7 @@ const HomePage = () => {
         dispatch(addCountriesAction(countriesData));
     }
     
-    const handleFilterCountries = (textTyped) => {
+    const handleFilterCountries = (textTyped) => {        
         setAlreadyFilter(true);
         
         /* Filtra lista do redux */
@@ -108,9 +120,12 @@ const HomePage = () => {
                         .then((resCountries) => {                    
                             if (resCountries.success) {
                                 let countries = resCountries.data;
-                                let countriesToAdd = verifyCountrisToAdd(countries);
+                                let countriesToAdd = verifyCountrisToAdd(countries, 'redux');
                                 let newStateRedux = [...listCountriesRedux, ...countriesToAdd];
-                                let countriesList = verifyCountrisToAddInList(countriesToAdd);
+                                
+                                console.log('newStateRedux', newStateRedux);
+                                
+                                let countriesList = verifyCountrisToAdd(countriesToAdd, 'list');
 
                                 addCountries(newStateRedux);
                                 setListFilterdCountries([...listCountries,...countriesList]);
@@ -195,14 +210,21 @@ const HomePage = () => {
                         <Form onSubmit={e => { e.preventDefault(); }}>
                             <Form.Row className="align-items-center">
                                 <Col xs={12} sm={12} md={12} xl={12}>
+                                    <Button onClick={ordenaArray} variant="secondary" className="button-order">
+                                        Ordenar por alfabeto
+                                    </Button>
+
+                                </Col>
+                                <Col xs={12} sm={12} md={12} xl={12}>
                                     <InputGroup className="mb-2">
                                         <InputGroup.Prepend>
                                             <InputGroup.Text><BsSearch/></InputGroup.Text>
                                         </InputGroup.Prepend>
                                         <FormControl 
                                             size="lg"
+                                            type="text"
                                             id="searchCountry" 
-                                            defaultValue={textFilter}
+                                            maxLength={50}
                                             placeholder="Procure por um país..."
                                             onChange={(e) => handleFilterCountries(e.target.value)} 
                                         />
@@ -211,14 +233,13 @@ const HomePage = () => {
                             </Form.Row>
                         </Form>
                         
-                        {/* (listCountries.length < listCountriesRedux.length) */}
-
                         <InfiniteScroll
                             dataLength={listCountries.length}
                             next={fetchMoreData}
                             hasMore={
                                 (listFilterdCountries.length <= 0  && listCountriesRedux.length < 250 ) || 
-                                (listFilterdCountries.length > 0 && listCountries.length < listFilterdCountries.length)
+                                (listFilterdCountries.length > 0 && listCountries.length < listFilterdCountries.length) ||
+                                (listCountries.length < listFilterdCountries.length || listCountriesRedux.length < 250)
                             }
                             loader={ 
                                 <div className="box-layout__aling-middle">

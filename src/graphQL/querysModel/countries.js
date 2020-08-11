@@ -1,12 +1,13 @@
 export const searchAllCountries = (queryText, offSetNumber) => {
-    
-    if(queryText !== ''){
-        queryText = queryText.charAt(0).toUpperCase()+ queryText.slice(1);
-    }
+    queryText = queryText.replace(/(^|,\s*)"+/g,'$1');    
+    // if(queryText !== ''){
+        // queryText = queryText.charAt(0).toUpperCase()+ queryText.slice(1);
+    // }
 
+    // Country ${queryText === '' ? `(first:6 offset: ${offSetNumber})` : '(filter: { name_starts_with: "' + queryText + '" OR:[ {name_contains: "'+ queryText + '"} ] })'}  { 
     let queryCountry = `
     {
-        Country ${queryText === '' ? `(first:6 offset: ${offSetNumber})` : '(filter: { name_starts_with: "' + queryText + '" OR:[ {name_contains: "'+ queryText + '"} ] })'}  { 
+        Country ${queryText === '' ? `(first:6 offset: ${offSetNumber})` : '(filter: { name_contains: "' + queryText + '"})'}  { 
             name 
             nativeName 
             alpha3Code 
@@ -25,35 +26,3 @@ export const searchAllCountries = (queryText, offSetNumber) => {
     }`;
     return queryCountry;
 };
-
-
-
-// query {
-  
-// 	Country(
-    
-//     filter: {
-//       	name_starts_with: "Bra" OR:[
-//         {name_contains: "Bra"}
-//       ]
-//     }
-//   ) 
-  
-//   { 	
-//       name
-//       nativeName 
-//       alpha3Code 
-//       area 
-//       population 
-//       capital 
-//       flag { 
-//           emoji 
-//           emojiUnicode 
-//           svgFile 
-//       } 
-//       topLevelDomains { 
-//           name 
-//       }
-      
-//   } 
-// }

@@ -1,23 +1,20 @@
 .box-layout {
-  align-items: center;
-  // background: url('/images/abstract_bg.jpg');
-  background-size: cover;
-  display: flex;
-  // height: 100vh;
-  justify-content: center;
-  width: 100vw;
+    align-items: center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    width: 100vw;
 }
 
 .box-layout__logo {
-  max-width: 200px;
+    max-width: 200px;
 }
 
 .box-layout__box {
-  //background: fade-out(white, .15);
-  border-radius: 3px;
-  padding: $l-size $m-size;
-  text-align: center;
-  width: 40rem;
+    border-radius: 3px;
+    padding: $l-size $m-size;
+    text-align: center;
+    width: 40rem;
 }
 
 .box-layout__title {
@@ -30,8 +27,37 @@
 }
 
 .box-title__main-title {
-  font-size: 38px;
-  color: #3a3a3acc;
-  line-height: 56px;
-  text-align: center;
+    color: #3a3a3acc;
+    text-align: center;
+    font-size: 38px;
+
+    @media (max-width: 767px) {
+        font-size: 24px;
+        line-height: 24px;
+    }
+
+    @media (min-width: 720px) and (max-width: 767px) {
+        font-size: 35px;
+        line-height: 26px;
+    }
+
+    @media (min-width: $desktop-breakpoint - .01rem) {
+        font-size: 38px;
+        line-height: 28px;
+    }
+}
+
+.box__content {
+    @media (max-width: 767px) {
+        padding: $s-size;
+    }
+
+    @media (min-width: 720px) and (max-width: 767px) {
+        padding: $m-size;
+    }
+
+    @media (min-width: $desktop-breakpoint - .01rem) {
+        padding: $xl-size;
+    }
+  
 }
