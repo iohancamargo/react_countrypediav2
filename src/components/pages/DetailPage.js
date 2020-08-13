@@ -1,8 +1,8 @@
 /* Libs */
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from "react";
+import { useSelector,useDispatch } from 'react-redux';
 
 /* Bootstrap components */
 import { Container, Row, Col, Card, Form } from 'react-bootstrap';
@@ -11,9 +11,11 @@ import { Container, Row, Col, Card, Form } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { history } from '../../routers/AppRouter';
 import { formatNumberPtBr } from '../../filters/formatNumberBr';
+import { startGetDetailCountries, startGetCountryByName } from '../../actions/countries';
 
 const DetailPage = () => {
     const { country } = useParams();
+    const dispatch = useDispatch();
     const [selectedCountry, setSelectedCountry] = useState(null);
     const listCountriesRedux = useSelector(state => state.countries);
 
@@ -31,9 +33,53 @@ const DetailPage = () => {
                 toast.success("Selecione um país da lista inicial para visualizar os detalhes...");
                 history.push('/');
             }
-            setSelectedCountry(countrySelected[0]);
+
+            if(countrySelected[0] !== undefined){
+                if(!countrySelected[0].hasOwnProperty('distanceToOtherCountries')) {
+                    startGetDetailCountries(countrySelected[0]._id)
+                    .then((resCountries) => {                    
+                        if (resCountries.success) {
+                            countrySelected[0].distanceToOtherCountries = resCountries.data;
+                            countrySelected[0].distanceToOtherCountries.forEach(countryDistance => {                                
+                                let countryClose = listCountriesRedux.filter((countryList) => countryList.name === countryDistance.countryName);
+
+                                /* Significa que não foi carregado no redux ainda */
+                                if(countryClose.length === 0) {
+                                    startGetCountryByName(countryDistance.countryName)
+                                    .then((countrySearch) => {
+                                        let newCountry = countrySearch.data;                                        
+                                        countryDistance.flag = newCountry.flag;
+                                        countryDistance.latitude = newCountry.location.latitude;
+                                        countryDistance.longitude = newCountry.location.longitude;
+                                        let newStateRedux = [...listCountriesRedux, newCountry];
+                                        addCountries(newStateRedux);
+                                        setSelectedCountry(countrySelected[0]);                                        
+                                    })
+                                } else {
+                                    countryDistance.flag = countryClose[0].flag;
+                                    countryDistance.latitude = countryClose[0].location.latitude;
+                                    countryDistance.longitude = countryClose[0].location.longitude;
+                                    setSelectedCountry(countrySelected[0]);
+                                }
+                            });
+                        } else {
+                            toast.error("Não foi possível realizar a comunicação com a API...");
+                        }
+                    });
+                }else {
+                    setSelectedCountry(countrySelected[0]);
+                }
+            }
         }
     }, [country, listCountriesRedux] );
+
+    const addCountries = (countriesData) => {
+        dispatch(addCountriesAction(countriesData));
+    }
+    
+    const addCountriesAction = (countries) => {
+        return { type: 'POPULATE_COUNTRIES', countries }
+    }
 
     return (
         <>
@@ -96,13 +142,32 @@ const DetailPage = () => {
                                             </Form.Group>
                                         </Form.Row>
                                         <Form.Row>
-                                            <Form.Group as={Col} xs={12} sm={6} md={12} xl={12} controlId="toplvl">
+                                            <Form.Group as={Col} xs={12} sm={12} md={12} xl={12} controlId="toplvl">
                                                 <Form.Label>
                                                     <strong>Domínios</strong>
                                                 </Form.Label>
                                                 <Form.Control type="text" placeholder="Área" defaultValue={selectedCountry.topLevelDomains.length > 0 ? selectedCountry.topLevelDomains.map((domain) => `${domain.name} `) : '' } disabled/>
                                             </Form.Group>
                                         </Form.Row>
+                                        { selectedCountry.hasOwnProperty('distanceToOtherCountries') && 
+                                            <Form.Row>
+                                                <Form.Group as={Col} xs={12} sm={12} md={12} xl={12} controlId="closeCountry">
+                                                    <Form.Label>
+                                                        <strong>Países próximos:</strong>
+                                                    </Form.Label>
+                                                    {selectedCountry.distanceToOtherCountries.map((country) => (
+                                                        <Form.Row key={country.countryName}>
+                                                            <Form.Group as={Col} xs={3} sm={3} md={3} xl={3} controlId="flagIcon">
+                                                                <span className="icon-as-img-small">{country.flag?.emoji}</span>
+                                                            </Form.Group>
+                                                            <Form.Group as={Col} xs={9} sm={9} md={9} xl={9} controlId="nameDistance">
+                                                                <strong>{country.countryName}</strong>: {formatNumberPtBr(country.distanceInKm)} (km)
+                                                            </Form.Group>
+                                                        </Form.Row>
+                                                    ))}
+                                                </Form.Group>
+                                            </Form.Row>
+                                        }
                                     </Form>
                                 </Card.Body>
                             </Card>

@@ -8,6 +8,7 @@ export const searchAllCountries = (queryText, offSetNumber) => {
     let queryCountry = `
     {
         Country ${queryText === '' ? `(first:6 offset: ${offSetNumber})` : '(filter: { name_contains: "' + queryText + '"})'}  { 
+            _id
             name 
             nativeName 
             alpha3Code 
@@ -22,7 +23,52 @@ export const searchAllCountries = (queryText, offSetNumber) => {
             topLevelDomains { 
                 name 
             }
+            location {
+                latitude
+                longitude
+            }
         } 
     }`;
     return queryCountry;
+};
+
+export const searchDetailCountry = (idCountry) => {
+    
+    let queryDetail = `{
+        Country(_id: "${idCountry}") {
+            distanceToOtherCountries(first: 5) {
+              distanceInKm
+              countryName
+            }
+          }
+    }`;
+    return queryDetail;
+};
+
+export const searchCountryByName = (nameCountry) => {
+    
+    let queryCountryByName = `{
+        Country(name: "${nameCountry}") {
+            _id
+            name 
+            nativeName 
+            alpha3Code 
+            area 
+            population 
+            capital 
+            flag { 
+                emoji 
+                emojiUnicode 
+                svgFile 
+            } 
+            topLevelDomains { 
+                name 
+            }
+            location {
+                latitude
+                longitude
+            }
+          }
+    }`;
+    return queryCountryByName;
 };

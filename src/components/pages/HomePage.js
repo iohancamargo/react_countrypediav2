@@ -122,9 +122,6 @@ const HomePage = () => {
                                 let countries = resCountries.data;
                                 let countriesToAdd = verifyCountrisToAdd(countries, 'redux');
                                 let newStateRedux = [...listCountriesRedux, ...countriesToAdd];
-                                
-                                console.log('newStateRedux', newStateRedux);
-                                
                                 let countriesList = verifyCountrisToAdd(countriesToAdd, 'list');
 
                                 addCountries(newStateRedux);
