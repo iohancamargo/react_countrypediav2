@@ -1,4 +1,5 @@
 /* Libs */
+import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from "react";
@@ -8,7 +9,7 @@ import { useSelector,useDispatch } from 'react-redux';
 import { Container, Row, Col, Card, Form } from 'react-bootstrap';
 
 /* Components */
-import { toast } from 'react-toastify';
+import MapWithAMarker from './MapPage';
 import { history } from '../../routers/AppRouter';
 import { formatNumberPtBr } from '../../filters/formatNumberBr';
 import { startGetDetailCountries, startGetCountryByName } from '../../actions/countries';
@@ -61,6 +62,9 @@ const DetailPage = () => {
                                     countryDistance.longitude = countryClose[0].location.longitude;
                                     setSelectedCountry(countrySelected[0]);
                                 }
+
+                                console.log('countrySelected[0]', countrySelected[0]);
+
                             });
                         } else {
                             toast.error("Não foi possível realizar a comunicação com a API...");
@@ -149,29 +153,19 @@ const DetailPage = () => {
                                                 <Form.Control type="text" placeholder="Área" defaultValue={selectedCountry.topLevelDomains.length > 0 ? selectedCountry.topLevelDomains.map((domain) => `${domain.name} `) : '' } disabled/>
                                             </Form.Group>
                                         </Form.Row>
-                                        { selectedCountry.hasOwnProperty('distanceToOtherCountries') && 
-                                            <Form.Row>
-                                                <Form.Group as={Col} xs={12} sm={12} md={12} xl={12} controlId="closeCountry">
-                                                    <Form.Label>
-                                                        <strong>Países próximos:</strong>
-                                                    </Form.Label>
-                                                    {selectedCountry.distanceToOtherCountries.map((country) => (
-                                                        <Form.Row key={country.countryName}>
-                                                            <Form.Group as={Col} xs={3} sm={3} md={3} xl={3} controlId="flagIcon">
-                                                                <span className="icon-as-img-small">{country.flag?.emoji}</span>
-                                                            </Form.Group>
-                                                            <Form.Group as={Col} xs={9} sm={9} md={9} xl={9} controlId="nameDistance">
-                                                                <strong>{country.countryName}</strong>: {formatNumberPtBr(country.distanceInKm)} (km)
-                                                            </Form.Group>
-                                                        </Form.Row>
-                                                    ))}
-                                                </Form.Group>
-                                            </Form.Row>
-                                        }
                                     </Form>
                                 </Card.Body>
                             </Card>
+                            {selectedCountry.distanceToOtherCountries.length === 5 && 
+                            <MapWithAMarker 
+                                countrySelected={selectedCountry}
+                                mapElement={<div style={{ height: `100%` }} />}
+                                containerElement={<div style={{ height: `400px` }} />} 
+                                loadingElement={<div style={{ height: `100%` }} />}
+                            />
+                        }
                         </Col>
+                        
                     </Row>
                 </Container>
                 </>
@@ -179,5 +173,8 @@ const DetailPage = () => {
         </>
     );
 };
-
+/* 
+    googleMapURL="https://maps.googleapis.com/maps/api/js?key=&v=3.exp" 
+    &libraries=geometry,drawing,places    
+*/
 export default DetailPage;
