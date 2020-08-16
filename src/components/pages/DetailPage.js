@@ -31,7 +31,7 @@ const DetailPage = () => {
             let countrySelected = listCountriesRedux.filter((countryList) => countryList.alpha3Code === country);
 
             if(countrySelected.length === 0){
-                toast.success("Selecione um país da lista inicial para visualizar os detalhes...");
+                toast.success("Select a country from the initial list to view details...");
                 history.push('/');
             }
 
@@ -62,12 +62,9 @@ const DetailPage = () => {
                                     countryDistance.longitude = countryClose[0].location.longitude;
                                     setSelectedCountry(countrySelected[0]);
                                 }
-
-                                console.log('countrySelected[0]', countrySelected[0]);
-
                             });
                         } else {
-                            toast.error("Não foi possível realizar a comunicação com a API...");
+                            toast.error("Could not communicate with the API...");
                         }
                     });
                 }else {
@@ -105,10 +102,9 @@ const DetailPage = () => {
                                     <Link to={`/`}>Home </Link>
                                 </span>
                                 <span className="breadcrumbs-text">
-                                    <strong> / Detalhes </strong>
+                                    <strong> / Details </strong>
                                 </span>
                             </div>
-                            <h1 className="box-title__main-title">Detalhes do país: {selectedCountry.nativeName} </h1>
                         </Col>
 
                         <Col xs={12} sm={12} md={12} key={selectedCountry.alpha3Code} >
@@ -119,9 +115,9 @@ const DetailPage = () => {
                                         <Form.Row>
                                             <Form.Group as={Col} xs={12} sm={6} md={6} xl={6} controlId="name">
                                                 <Form.Label>
-                                                    <strong>Nome</strong>
+                                                    <strong>Name</strong>
                                                 </Form.Label>
-                                                <Form.Control type="text" placeholder="Nome" defaultValue={selectedCountry.name} disabled/>
+                                                <Form.Control type="text" placeholder="Name" defaultValue={selectedCountry.name} disabled/>
                                             </Form.Group>
                                             <Form.Group as={Col} xs={12} sm={6} md={6} xl={6} controlId="capital">
                                                 <Form.Label>
@@ -134,38 +130,40 @@ const DetailPage = () => {
                                         <Form.Row>
                                             <Form.Group as={Col} xs={12} sm={6} md={6} xl={6} controlId="area">
                                                 <Form.Label>
-                                                    <strong>Área</strong>
+                                                    <strong>Area</strong>
                                                 </Form.Label>
-                                                <Form.Control type="text" placeholder="Área" defaultValue={formatNumberPtBr(selectedCountry.area)} disabled/>
+                                                <Form.Control type="text" placeholder="Area" defaultValue={formatNumberPtBr(selectedCountry.area)} disabled/>
                                             </Form.Group>
                                             <Form.Group as={Col} xs={12} sm={6} md={6} xl={6} controlId="population">
                                                 <Form.Label>
-                                                    <strong>População</strong>
+                                                    <strong>Population</strong>
                                                 </Form.Label>
-                                                <Form.Control type="text" placeholder="População" defaultValue={formatNumberPtBr(selectedCountry.population)} disabled/>
+                                                <Form.Control type="text" placeholder="Population" defaultValue={formatNumberPtBr(selectedCountry.population)} disabled/>
                                             </Form.Group>
                                         </Form.Row>
                                         <Form.Row>
                                             <Form.Group as={Col} xs={12} sm={12} md={12} xl={12} controlId="toplvl">
                                                 <Form.Label>
-                                                    <strong>Domínios</strong>
+                                                    <strong>Domains</strong>
                                                 </Form.Label>
-                                                <Form.Control type="text" placeholder="Área" defaultValue={selectedCountry.topLevelDomains.length > 0 ? selectedCountry.topLevelDomains.map((domain) => `${domain.name} `) : '' } disabled/>
+                                                <Form.Control type="text" placeholder="Domain" defaultValue={selectedCountry.topLevelDomains.length > 0 ? selectedCountry.topLevelDomains.map((domain) => `${domain.name} `) : '' } disabled/>
                                             </Form.Group>
                                         </Form.Row>
                                     </Form>
+                            <h1 className="box-title__main-title">Five closest countries</h1>
                                 </Card.Body>
                             </Card>
                             {selectedCountry.distanceToOtherCountries.length === 5 && 
+                            <>
                             <MapWithAMarker 
                                 countrySelected={selectedCountry}
                                 mapElement={<div style={{ height: `100%` }} />}
                                 containerElement={<div style={{ height: `400px` }} />} 
                                 loadingElement={<div style={{ height: `100%` }} />}
                             />
+                            </>
                         }
                         </Col>
-                        
                     </Row>
                 </Container>
                 </>
@@ -173,8 +171,5 @@ const DetailPage = () => {
         </>
     );
 };
-/* 
-    googleMapURL="https://maps.googleapis.com/maps/api/js?key=&v=3.exp" 
-    &libraries=geometry,drawing,places    
-*/
+
 export default DetailPage;

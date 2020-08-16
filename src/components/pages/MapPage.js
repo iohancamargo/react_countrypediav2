@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import MapMarkLine from './MapMarkLine';
-import { withGoogleMap, GoogleMap, Marker, Polyline, InfoWindow} from "react-google-maps";
+import { withGoogleMap, GoogleMap} from "react-google-maps";
 
 const MapWithAMarker = withGoogleMap((props) =>
 
@@ -10,17 +10,13 @@ const MapWithAMarker = withGoogleMap((props) =>
         defaultCenter={{ lat: props.countrySelected.location.latitude, lng: props.countrySelected.location.longitude }}
     >
 
-        <Marker
-            key={props.countrySelected._id}
-            position={{ lat: props.countrySelected.location.latitude, lng: props.countrySelected.location.longitude }}
-            
-            labelAnchor={new window.google.maps.Point(0, 0)}
-        >
-            <InfoWindow >
-                <span>País selecionado: {props.countrySelected.name}</span>
-            </InfoWindow>
-        </Marker>
-
+        <MapMarkLine 
+            mainCountry={true}
+            country={props.countrySelected}
+            latitudeRef={props.countrySelected.location.latitude}
+            longitudeRef={props.countrySelected.location.longitude}
+            index={props.countrySelected.distanceToOtherCountries.length +1}
+        />
 
     {
         props.countrySelected.distanceToOtherCountries.length === 5 && 
@@ -31,6 +27,7 @@ const MapWithAMarker = withGoogleMap((props) =>
                     <MapMarkLine 
                         country={country}
                         index={keyCountry}
+                        mainCountry={false}
                         latitudeRef={props.countrySelected.location.latitude}
                         longitudeRef={props.countrySelected.location.longitude}
                     />                        

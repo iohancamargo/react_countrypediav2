@@ -1,16 +1,19 @@
 /* Libs  */
 import React from 'react';
-import { withRouter } from "react-router";
+import { Link } from 'react-router-dom';
 import { Navbar } from 'react-bootstrap';
+import { withRouter } from "react-router";
 
 export const Header = () => {
     return (
         <>
         <header>
             <Navbar bg="dark" variant="dark">
-                <Navbar.Brand href="#home">
-                Countrypedia
-                </Navbar.Brand>
+                <Link to={`/`}>
+                    <Navbar.Brand>
+                        Countrypedia
+                    </Navbar.Brand>
+                </Link>
             </Navbar>
         </header>
         </>

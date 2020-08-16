@@ -83,7 +83,7 @@ const HomePage = () => {
                         setOffsetSearch(offSetSearch + 6);
                         setListCountries([...listCountries, ...newStateRedux.slice(listCountries.length, listCountries.length + 6)]);
                     } else {
-                        toast.error("Não foi possível realizar a comunicação com a API...");
+                        toast.error("Could not communicate with the API...");
                     }
                 });
             } else {
@@ -128,7 +128,7 @@ const HomePage = () => {
                                 setListFilterdCountries([...listCountries,...countriesList]);
                                 setListCountries([...countriesList.slice(0, 6)]);
                             } else {
-                                toast.error("Não foi possível realizar a comunicação com a API...");
+                                toast.error("Could not communicate with the API...");
                             }
                         });
                     } else {
@@ -165,7 +165,7 @@ const HomePage = () => {
                         addCountries(countries);
                         setListCountries(countries.slice(listCountries.length, listCountries.length + 6));
                     } else {
-                        toast.error("Não foi possível realizar a comunicação com a API...");
+                        toast.error("Could not communicate with the API...");
                     }
                 });
         } else {
@@ -193,22 +193,22 @@ const HomePage = () => {
                 /* Caso não tenha retorno na api essa mensagem é exibida */
                 listCountriesRedux.length === 0 && 
                 <Container className="align-items-center">                    
-                    <h1 className="box-title__main-title">Não existem países cadastrados na api.</h1>
+                    <h1 className="box-title__main-title">There are no countries registered in the api.</h1>
                 </Container>
             }
             {
                 listCountriesRedux.length > 0 &&
                     <Container className="align-items-center">
                         {(alreadySearch && listCountries.length === 0) ?
-                            (<h1 className="box-title__main-title">Não foi localizado registros com o filtro informado.</h1>) :
-                            (<h1 className="box-title__main-title">Explore os países do mundo</h1>)
+                            (<h1 className="box-title__main-title">No records were found with the specified filter.</h1>) :
+                            (<h1 className="box-title__main-title">Explore the countries of the world</h1>)
                         }
                         
                         <Form onSubmit={e => { e.preventDefault(); }}>
                             <Form.Row className="align-items-center">
                                 <Col xs={12} sm={12} md={12} xl={12}>
                                     <Button onClick={ordenaArray} variant="secondary" className="button-order">
-                                        Ordenar por alfabeto
+                                        Sort by alphabet
                                     </Button>
 
                                 </Col>
@@ -222,7 +222,7 @@ const HomePage = () => {
                                             type="text"
                                             id="searchCountry" 
                                             maxLength={50}
-                                            placeholder="Procure por um país..."
+                                            placeholder="Search for a country..."
                                             onChange={(e) => handleFilterCountries(e.target.value)} 
                                         />
                                     </InputGroup>
@@ -262,10 +262,10 @@ const HomePage = () => {
                                             </Card.Body>
                                             <div className="card-block">
                                                 <Button className="buttons__actions" variant="primary" onClick={() => history.push(`/detail/${country.alpha3Code}/`)}>
-                                                    Detalhes
+                                                    Details
                                                 </Button>
                                                 <Button className="buttons__actions" variant="warning" onClick={() => history.push(`/edit/${country.alpha3Code}/`)} >
-                                                    Editar
+                                                    Edit
                                                 </Button>
                                             </div>
                             

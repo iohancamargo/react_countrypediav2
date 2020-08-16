@@ -16,13 +16,14 @@ export const MapMarkWithLine = (props) => {
     return (
         <Marker
             key={props.index}
-            position={{ lat: props.country?.latitude, lng: props.country?.longitude}}
-            label={(props.index +1).toString()}
+            position={{ lat: props.mainCountry ? props.country?.location.latitude: props.country?.latitude, lng: props.mainCountry ? props.country?.location.longitude : props.country?.longitude}}
+            label={ props.mainCountry ? '' : (props.index +1).toString()}
             onClick={() => handleToggleOpen()}
         >
             {
                 isOpen &&
                 <>
+                {!props.mainCountry && 
                 <Polyline
                     path={[
                         { lat: props.latitudeRef, lng: props.longitudeRef },
@@ -41,8 +42,9 @@ export const MapMarkWithLine = (props) => {
                         ]
                     }}
                 />
+                }
                 <InfoWindow onCloseClick={handleToggleClose}>
-                    <span>{props.country?.countryName}: {formatNumberPtBr(props.country?.distanceInKm)} (km)</span>
+                    <span> {props.country?.flag.emoji}  {props.mainCountry ? props.country?.name : props.country?.countryName +':' + formatNumberPtBr(props.country?.distanceInKm) + '(km)' }</span>
                 </InfoWindow>
                 </>
             }
