@@ -16,7 +16,7 @@ export const MapMarkWithLine = (props) => {
     return (
         <Marker
             key={props.index}
-            position={{ lat: props.mainCountry ? props.country?.location.latitude: props.country?.latitude, lng: props.mainCountry ? props.country?.location.longitude : props.country?.longitude}}
+            position={{ lat: props.mainCountry ? props.country.location.latitude: props.country.latitude, lng: props.mainCountry ? props.country.location.longitude : props.country.longitude}}
             label={ props.mainCountry ? '' : (props.index +1).toString()}
             onClick={() => handleToggleOpen()}
         >
@@ -27,7 +27,7 @@ export const MapMarkWithLine = (props) => {
                 <Polyline
                     path={[
                         { lat: props.latitudeRef, lng: props.longitudeRef },
-                        { lat: props.country?.latitude, lng: props.country?.longitude  }
+                        { lat: props.country.latitude, lng: props.country.longitude  }
                     ]}
                     geodesic={true}
                     options={{
@@ -44,7 +44,7 @@ export const MapMarkWithLine = (props) => {
                 />
                 }
                 <InfoWindow onCloseClick={handleToggleClose}>
-                    <span> {props.country?.flag.emoji}  {props.mainCountry ? props.country?.name : props.country?.countryName +':' + formatNumberPtBr(props.country?.distanceInKm) + '(km)' }</span>
+                    <span> {props.country?.flag.emoji}  {props.mainCountry ? props.country.name : props.country.countryName +':' + formatNumberPtBr(props.country.distanceInKm) + '(km)' }</span>
                 </InfoWindow>
                 </>
             }

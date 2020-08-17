@@ -31,7 +31,6 @@ test('should populate countries with redux', () => {
 
 /* Testa a adicao de array de dados de paises */
 test('should add countries with redux', () => {
-    let newIndex = countries.length;
     const action = { type: 'POPULATE_COUNTRIES', countries };
     const state = countriesReducer([], action);
 

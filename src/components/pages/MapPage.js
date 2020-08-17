@@ -19,9 +19,8 @@ const MapWithAMarker = withGoogleMap((props) =>
         />
 
     {
-        props.countrySelected.distanceToOtherCountries.length === 5 && 
+        
         props.countrySelected.distanceToOtherCountries.map((country, keyCountry) => {
-        if(country.latitude > 0 && country.longitude > 0){
             return (
                 <div key={country.countryName} >
                     <MapMarkLine 
@@ -33,7 +32,6 @@ const MapWithAMarker = withGoogleMap((props) =>
                     />                        
                 </div>
             )
-        }
         })
     }
 

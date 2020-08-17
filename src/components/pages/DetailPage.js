@@ -27,9 +27,7 @@ const DetailPage = () => {
         }
 
         if(country !== null){
-
             let countrySelected = listCountriesRedux.filter((countryList) => countryList.alpha3Code === country);
-
             if(countrySelected.length === 0){
                 toast.success("Select a country from the initial list to view details...");
                 history.push('/');
@@ -40,31 +38,49 @@ const DetailPage = () => {
                     startGetDetailCountries(countrySelected[0]._id)
                     .then((resCountries) => {                    
                         if (resCountries.success) {
-                            countrySelected[0].distanceToOtherCountries = resCountries.data;
-                            countrySelected[0].distanceToOtherCountries.forEach(countryDistance => {                                
-                                let countryClose = listCountriesRedux.filter((countryList) => countryList.name === countryDistance.countryName);
+                            let arrPromisses = [];                            
+                            let distanceCountries = resCountries.data;
 
-                                /* Significa que não foi carregado no redux ainda */
+                            distanceCountries.forEach((countryDistance, key) => {
+                                let countryClose = listCountriesRedux.filter((countryList) => countryList.name === countryDistance.countryName);
                                 if(countryClose.length === 0) {
-                                    startGetCountryByName(countryDistance.countryName)
-                                    .then((countrySearch) => {
-                                        let newCountry = countrySearch.data;                                        
-                                        countryDistance.flag = newCountry.flag;
-                                        countryDistance.latitude = newCountry.location.latitude;
-                                        countryDistance.longitude = newCountry.location.longitude;
-                                        let newStateRedux = [...listCountriesRedux, newCountry];
-                                        addCountries(newStateRedux);
-                                        setSelectedCountry(countrySelected[0]);                                        
-                                    })
+                                    arrPromisses.push(startGetCountryByName(countryDistance.countryName));
                                 } else {
                                     countryDistance.flag = countryClose[0].flag;
                                     countryDistance.latitude = countryClose[0].location.latitude;
-                                    countryDistance.longitude = countryClose[0].location.longitude;
-                                    setSelectedCountry(countrySelected[0]);
+                                    countryDistance.longitude = countryClose[0].location.longitude;                            
                                 }
                             });
+
+                            if(arrPromisses.length > 0) {
+                                Promise.all(arrPromisses)
+                                .then((countrysData) => {
+                                    let listCountryRedux = listCountriesRedux;
+                                    let countryArr = [];
+                                    countrysData.forEach(countryFil => {
+                                        countryArr.push(countryFil.data);
+                                    });
+                                    countryArr.forEach(newCountry => {
+                                        listCountryRedux = [...listCountriesRedux, newCountry];
+                                        distanceCountries.forEach(countryDistance => {
+                                            if(countryDistance.countryName === newCountry.name){
+                                                countryDistance.flag = newCountry.flag;
+                                                countryDistance.latitude = newCountry.location.latitude;
+                                                countryDistance.longitude = newCountry.location.longitude;
+                                            }
+                                        });
+                                    });
+                                    countrySelected[0].distanceToOtherCountries = distanceCountries;
+                                    setSelectedCountry(countrySelected[0]);      
+                                    addCountries(listCountryRedux);
+
+                                });
+                            } else {
+                                countrySelected[0].distanceToOtherCountries = distanceCountries;
+                                setSelectedCountry(countrySelected[0]);     
+                            }
                         } else {
-                            toast.error("Could not communicate with the API...");
+                            toast.error("Não foi possível realizar a comunicação com a API...");
                         }
                     });
                 }else {
