@@ -2,7 +2,7 @@
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector,useDispatch } from 'react-redux';
 
 /* Bootstrap components */
@@ -89,10 +89,10 @@ const DetailPage = () => {
             }
         }
     }, [country, listCountriesRedux] );
-
-    const addCountries = (countriesData) => {
-        dispatch(addCountriesAction(countriesData));
-    }
+    
+    const addCountries = useCallback((countriesData) => {
+        dispatch(addCountriesAction(countriesData)) 
+    }, [dispatch]);
     
     const addCountriesAction = (countries) => {
         return { type: 'POPULATE_COUNTRIES', countries }
